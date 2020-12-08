@@ -37,6 +37,8 @@ import java.awt.peer.WindowPeer;
 import java.util.Objects;
 
 import sun.java2d.SunGraphicsEnvironment;
+import sun.java2d.macos.MacOSFlags;
+import sun.java2d.metal.MTLGraphicsConfig;
 import sun.java2d.opengl.CGLGraphicsConfig;
 
 import static java.awt.peer.ComponentPeer.SET_BOUNDS;
@@ -63,7 +65,9 @@ public final class CGraphicsDevice extends GraphicsDevice
 
     public CGraphicsDevice(final int displayID) {
         this.displayID = displayID;
-        config = CGLGraphicsConfig.getConfig(this);
+        config = MacOSFlags.isMetalEnabled() ?
+                MTLGraphicsConfig.getConfig(this, displayID, 0) :
+                CGLGraphicsConfig.getConfig(this);
         // initializes default device state, might be redundant step since we
         // call "displayChanged()" later anyway, but we do not want to leave the
         // device in an inconsistent state after construction
